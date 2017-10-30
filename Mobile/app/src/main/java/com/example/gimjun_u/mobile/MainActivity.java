@@ -27,7 +27,7 @@ import com.yayandroid.locationmanager.constants.FailType;
 import com.yayandroid.locationmanager.constants.ProcessType;
 import com.example.gimjun_u.mobile.SamplePresenter;
 import com.example.gimjun_u.mobile.SamplePresenter.SampleView;
-import com.example.gimjun_u.mobile.SqlLite;
+import com.example.gimjun_u.mobile.SqLite;
 
 import java.util.Random;
 
@@ -42,10 +42,10 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
 
     private ProgressDialog progressDialog;
     private SamplePresenter samplePresenter;
-    private SqlLite sqlLite;
 
     private boolean running;
     Random mRand;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,8 +53,8 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         ButterKnife.bind(this);
         Reprint.initialize(this);
         samplePresenter = new SamplePresenter(this);
-        final SqlLite sqlLite = new SqlLite(getApplicationContext(),"locationData.db",null,1);
-        sqlLite.insert(5,4);
+        final SqLite sqLite = new SqLite(getApplicationContext(),"locationData.db",null,1);
+        sqLite.insert(5,4);
         getLocation();
 
 
