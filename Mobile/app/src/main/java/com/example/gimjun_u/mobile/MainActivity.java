@@ -46,7 +46,6 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
 
     private boolean running;
     Random mRand;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +53,8 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         ButterKnife.bind(this);
         Reprint.initialize(this);
         samplePresenter = new SamplePresenter(this);
+        final SqlLite sqlLite = new SqlLite(getApplicationContext(),"locationData.db",null,1);
+        sqlLite.insert(5,4);
         getLocation();
 
 
