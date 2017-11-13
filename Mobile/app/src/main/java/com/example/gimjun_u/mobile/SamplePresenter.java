@@ -21,7 +21,7 @@ public class SamplePresenter {
 
     public void onLocationChanged(Location location) {
         sampleView.dismissProgress();
-        setText(location);
+        getLocationData(location);
     }
 
     public void onLocationFailed(@FailType int failType) {
@@ -93,23 +93,19 @@ public class SamplePresenter {
         }
     }
 
-    private void setText(Location location) {
-        String appendValue = location.getLatitude() + ", " + location.getLongitude() + "\n";
-        String newValue;
-        CharSequence current = sampleView.getText();
 
-        if (!TextUtils.isEmpty(current)) {
-            newValue = current + appendValue;
-        } else {
-            newValue = appendValue;
-        }
+    private void getLocationData(Location location){
+        Double Latitude = location.getLatitude();
+        Double Longitude = location.getLongitude();
 
-        sampleView.setText(newValue);
+        MainActivity.Latitude = Latitude;
+        MainActivity.Longitude = Longitude;
+
     }
 
     public interface SampleView {
 
-        String getText();
+        void compareLocationData();
 
         void setText(String text);
 

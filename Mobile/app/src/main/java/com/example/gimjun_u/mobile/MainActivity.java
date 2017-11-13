@@ -31,7 +31,6 @@ import com.example.gimjun_u.mobile.SqLite;
 
 import java.util.Random;
 
-
 public class MainActivity extends LocationBaseActivity implements SampleView{
 
     @Bind(R.id.result)
@@ -46,6 +45,9 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
     private boolean running;
     Random mRand;
 
+    static Double Latitude = 0.0;
+    static Double Longitude = 0.0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,17 +55,25 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         ButterKnife.bind(this);
         Reprint.initialize(this);
         samplePresenter = new SamplePresenter(this);
-        final SqLite sqLite = new SqLite(getApplicationContext(),"locationData.db",null,1);
-        sqLite.insert(5,4);
         getLocation();
+        compareLocationData();
+    }
 
+    public void compareLocationData(){
+        final SqLite sqLite = new SqLite(getApplicationContext(),"locationData.db",null,1);
 
-        if (running) {
-            cancel();
-        } else {
-            start();
+        Double savedLatitude = sqLite.select();
+
+        if (savedLatitude.equals(Latitude)){
+            if (running) {
+                cancel();
+            } else {
+                start();
+            }
         }
-
+        else {
+            alertLocationData();
+        }
     }
 
     private void start() {
@@ -83,7 +93,6 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         else if (!Reprint.isHardwarePresent()){
             finish();
         }
-
 
     }
 
@@ -141,11 +150,6 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         if (!progressDialog.isShowing()) {
             progressDialog.show();
         }
-    }
-
-    @Override
-    public String getText() {
-        return locationText.getText().toString();
     }
 
     @Override
@@ -217,6 +221,32 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         builder.create().show();
     }
 
+    public void alertLocationData(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("등록된 위치정보가 없습니다");
+        builder.setMessage("위치정보를 등록 하시겠습니까?");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch(which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        start();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        finish();
+                        break;
+                }
+            }
+
+        };
+
+        builder.setPositiveButton("Registration",dialogClickListener);
+        builder.setNegativeButton("Exit",dialogClickListener);
+        builder.create().show();
+    }
+
     private void cancel() {
         result.setText("Fingerprint authentication failure");
         running = false;
@@ -226,6 +256,8 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
     private void showSuccess() {
         result.setText("Fingerprint authentication success");
         running = false;
+        final SqLite sqLite = new SqLite(getApplicationContext(),"locationData.db",null,1);
+        sqLite.insert(35.1111,128.2222);
     }
 
     private void showError(AuthenticationFailureReason failureReason, boolean fatal,
