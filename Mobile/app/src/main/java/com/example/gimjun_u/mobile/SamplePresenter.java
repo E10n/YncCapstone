@@ -1,6 +1,7 @@
 package com.example.gimjun_u.mobile;
 
 
+import android.location.Address;
 import android.location.Location;
 import android.text.TextUtils;
 
@@ -94,18 +95,17 @@ public class SamplePresenter {
     }
 
 
-    private void getLocationData(Location location){
+    public void getLocationData(Location location){
         Double Latitude = location.getLatitude();
         Double Longitude = location.getLongitude();
 
-        MainActivity.Latitude = Latitude;
-        MainActivity.Longitude = Longitude;
+        sampleView.getAddress(Latitude,Longitude);
 
     }
 
     public interface SampleView {
 
-        void compareLocationData();
+        void getAddress(Double Latitude, Double Longitude);
 
         void setText(String text);
 

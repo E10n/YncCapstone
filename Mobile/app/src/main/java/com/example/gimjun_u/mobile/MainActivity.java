@@ -1,8 +1,12 @@
 package com.example.gimjun_u.mobile;
 
+
+
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
@@ -29,6 +33,8 @@ import com.example.gimjun_u.mobile.SamplePresenter;
 import com.example.gimjun_u.mobile.SamplePresenter.SampleView;
 import com.example.gimjun_u.mobile.SqLite;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends LocationBaseActivity implements SampleView{
@@ -36,17 +42,14 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
     @Bind(R.id.result)
     TextView result;
 
-    @Bind(R.id.locationText)
-    TextView locationText;
-
     private ProgressDialog progressDialog;
     private SamplePresenter samplePresenter;
 
     private boolean running;
+    private boolean isSameData;
     Random mRand;
 
-    static Double Latitude = 0.0;
-    static Double Longitude = 0.0;
+    static String Address;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,24 +59,52 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         Reprint.initialize(this);
         samplePresenter = new SamplePresenter(this);
         getLocation();
-        compareLocationData();
     }
+
 
     public void compareLocationData(){
         final SqLite sqLite = new SqLite(getApplicationContext(),"locationData.db",null,1);
-
-        Double savedLatitude = sqLite.select();
-
-        if (savedLatitude.equals(Latitude)){
-            if (running) {
-                cancel();
-            } else {
-                start();
+        for (int i=1;i <= 5;i++){
+            if (sqLite.select(i).equals(Address)){
+                if (running) {
+                    cancel();
+                } else {
+                    isSameData = true;
+                    start();
+                }
+                break;
+            }
+            else if (!sqLite.select(i).equals(Address)){
+                result.setText(sqLite.select(i));
+                if (i == 5){
+                    alertLocationData();
+                    break;
+                }
+                continue;
             }
         }
-        else {
-            alertLocationData();
+    }
+
+    @Override
+    public void getAddress(Double Latitude,Double Longitude){
+        final Geocoder geocoder = new Geocoder(this);
+        String nowAddress = "Not verify your location.";
+        List <Address> address = null;
+        try {
+            if (geocoder != null){
+                address = geocoder.getFromLocation(Latitude,Longitude,1);
+
+                if (address != null && address.size() > 0){
+                    String currentLocationAddress = address.get(0).getAddressLine(1).toString();
+                    nowAddress = currentLocationAddress;
+                    Address = nowAddress;
+                }
+            }
+        } catch (IOException e){
+            result.setText("Could not fetch address.");
+            e.printStackTrace();
         }
+        compareLocationData();
     }
 
     private void start() {
@@ -95,7 +126,6 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         }
 
     }
-
 
     @Override
     protected void onDestroy() {
@@ -154,7 +184,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
 
     @Override
     public void setText(String text) {
-        locationText.setText(text);
+        result.setText(text);
     }
 
     @Override
@@ -199,7 +229,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
 
     public void alertFingerprint(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Fingerprints not registered");
+        builder.setTitle("There is no registered fingerprint authentication information.");
         builder.setMessage("Are you going to register?");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -223,14 +253,15 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
 
     public void alertLocationData(){
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("등록된 위치정보가 없습니다");
-        builder.setMessage("위치정보를 등록 하시겠습니까?");
+        builder.setTitle("There is no registered location information.");
+        builder.setMessage("Are you going to register?");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener(){
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch(which){
                     case DialogInterface.BUTTON_POSITIVE:
+                        isSameData = false;
                         start();
                         break;
 
@@ -255,9 +286,11 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
 
     private void showSuccess() {
         result.setText("Fingerprint authentication success");
-        running = false;
         final SqLite sqLite = new SqLite(getApplicationContext(),"locationData.db",null,1);
-        sqLite.insert(35.1111,128.2222);
+        if (!isSameData){
+            sqLite.insert(Address,1);
+        }
+        running = false;
     }
 
     private void showError(AuthenticationFailureReason failureReason, boolean fatal,
