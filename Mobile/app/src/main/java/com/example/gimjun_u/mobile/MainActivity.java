@@ -112,7 +112,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
             if (Reprint.hasFingerprintRegistered()){
                 mRand = new Random();
                 String nFinger = RandFinger(2,5);
-                result.setText("Please put "+nFinger+" to Device");
+                result.setText("Please put "+nFinger+"");
                 running = true;
                 fingerprintRegistration();
             }

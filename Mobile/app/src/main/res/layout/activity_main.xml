@@ -12,14 +12,20 @@
         android:id="@+id/imageView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:scaleType="fitXY"
-        app:srcCompat="@drawable/bbbll" />
+        app:srcCompat="@drawable/purplesky"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
 
     <TextView
         android:id="@+id/result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="Result"
-        android:textSize="25dp" />
+        android:textSize="15dp"
+        android:gravity="center_horizontal"
+        />
 
 </android.support.constraint.ConstraintLayout>
