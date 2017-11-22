@@ -16,6 +16,7 @@ public class SqLite extends SQLiteOpenHelper{
 
     }
 
+    //app이 실행될 때 sqlite DB생성
     @Override
     public void onCreate(SQLiteDatabase db){
         String sql = "CREATE TABLE LocationTable(No INTEGER PRIMARY KEY AUTOINCREMENT,Location TEXT,isFingerAuth BOOLEAN,Date DATE);";
@@ -29,6 +30,7 @@ public class SqLite extends SQLiteOpenHelper{
         onCreate(db);
     }
 
+    //위치정보 데이터 뽑아내기
     public String select(int No){
         SQLiteDatabase db = getReadableDatabase();
         String sql = "SELECT Location FROM LocationTable WHERE No="+No+";";
@@ -42,6 +44,7 @@ public class SqLite extends SQLiteOpenHelper{
         return result;
     }
 
+    //위치정보를 DB에 저장
     public void insert(String LocationDt,int isFingerAuth){
         SQLiteDatabase db = getWritableDatabase();
         String sql = "INSERT INTO LocationTable VALUES(NULL,'"+LocationDt+"',"+isFingerAuth+",datetime('now'));";

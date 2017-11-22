@@ -94,7 +94,7 @@ public class SamplePresenter {
         }
     }
 
-
+    //위도 경도 수집
     public void getLocationData(Location location){
         Double Latitude = location.getLatitude();
         Double Longitude = location.getLongitude();

@@ -58,10 +58,10 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         ButterKnife.bind(this);
         Reprint.initialize(this);
         samplePresenter = new SamplePresenter(this);
-        getLocation();
+        getLocation(); //위치정보 수집
     }
 
-
+    //수집된 위치정보와 DB에 있는 위치정보를 비교하는 함수
     public void compareLocationData(){
         final SqLite sqLite = new SqLite(getApplicationContext(),"locationData.db",null,1);
         for (int i=1;i <= 5;i++){
@@ -85,6 +85,8 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         }
     }
 
+
+    //위도와 경도를 수집 후 주소로 변경해주는 함수
     @Override
     public void getAddress(Double Latitude,Double Longitude){
         final Geocoder geocoder = new Geocoder(this);
@@ -107,6 +109,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         compareLocationData();
     }
 
+    //지문인증 전 하드웨어에 지문인증기능이 있는지, 등록된 지문이 있는지 검증
     private void start() {
         if (Reprint.isHardwarePresent()){
             if (Reprint.hasFingerprintRegistered()){
@@ -212,6 +215,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
 
     }
 
+    //지문인증 함수
     private void fingerprintRegistration() {
         Reprint.authenticate(new AuthenticationListener() {
             @Override
@@ -227,6 +231,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         });
     }
 
+    //등록된 지문이 없을 시 알려주는 푸시창
     public void alertFingerprint(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("There is no registered fingerprint authentication information.");
@@ -251,6 +256,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         builder.create().show();
     }
 
+    //등록된 위치정보가 없을 시 알려주는 푸시창
     public void alertLocationData(){
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("There is no registered location information.");
@@ -278,12 +284,14 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         builder.create().show();
     }
 
+    //지문인증 취소
     private void cancel() {
         result.setText("Fingerprint authentication failure");
         running = false;
         Reprint.cancelAuthentication();
     }
 
+    //지문인증 성공
     private void showSuccess() {
         result.setText("Fingerprint authentication success");
         final SqLite sqLite = new SqLite(getApplicationContext(),"locationData.db",null,1);
