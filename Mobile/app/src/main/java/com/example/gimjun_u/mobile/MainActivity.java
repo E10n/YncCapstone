@@ -3,8 +3,10 @@ package com.example.gimjun_u.mobile;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -42,6 +44,13 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
     @Bind(R.id.result)
     TextView result;
 
+    @Bind(R.id.title)
+    TextView title;
+
+    @Bind(R.id.about)
+    TextView about;
+
+
     private ProgressDialog progressDialog;
     private SamplePresenter samplePresenter;
 
@@ -58,8 +67,14 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         ButterKnife.bind(this);
         Reprint.initialize(this);
         samplePresenter = new SamplePresenter(this);
+        Typeface tf = Typeface.createFromAsset(getAssets(),
+                "fonts/ClementePDac-ExtraLight.ttf");
+        result.setTypeface(tf);
+        title.setTypeface(tf);
+        about.setTypeface(tf);
         getLocation(); //위치정보 수집
     }
+
 
     //수집된 위치정보와 DB에 있는 위치정보를 비교하는 함수
     public void compareLocationData(){
@@ -260,7 +275,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
     public void alertLocationData(){
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("There is no registered location information.");
-        builder.setMessage("Are you going to register?");
+        builder.setMessage("Your Location is "+Address+". Are you going to register?");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener(){
             @Override
