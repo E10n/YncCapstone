@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.ajalt.reprint.core.AuthenticationFailureReason;
@@ -48,7 +49,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
     TextView title;
 
     @Bind(R.id.about)
-    TextView about;
+    Button about;
 
 
     private ProgressDialog progressDialog;
@@ -72,6 +73,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         result.setTypeface(tf);
         title.setTypeface(tf);
         about.setTypeface(tf);
+        running = false;
         getLocation(); //위치정보 수집
     }
 
@@ -90,9 +92,12 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
                 break;
             }
             else if (!sqLite.select(i).equals(Address)){
-                result.setText(sqLite.select(i));
-                if (i == 5){
+                if (sqLite.select(i).isEmpty()){
                     alertLocationData();
+                    break;
+                }
+                if (i == 5){
+                    alertLocationDatafail();
                     break;
                 }
                 continue;
@@ -184,7 +189,7 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
     @Override
     protected void onPause() {
         super.onPause();
-
+        cancel();
         dismissProgress();
     }
 
@@ -274,8 +279,8 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
     //등록된 위치정보가 없을 시 알려주는 푸시창
     public void alertLocationData(){
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("There is no registered location information.");
-        builder.setMessage("Your Location is "+Address+". Are you going to register?");
+        builder.setTitle("No registered location information or not enough");
+        builder.setMessage("Your Location is "+Address+". Are you going to Register?");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener(){
             @Override
@@ -295,6 +300,31 @@ public class MainActivity extends LocationBaseActivity implements SampleView{
         };
 
         builder.setPositiveButton("Registration",dialogClickListener);
+        builder.setNegativeButton("Exit",dialogClickListener);
+        builder.create().show();
+    }
+
+    public void alertLocationDatafail(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Not Match your LocationData !!!!");
+        builder.setMessage("Your Location is "+Address+".");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch(which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        isSameData = false;
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        finish();
+                        break;
+                }
+            }
+
+        };
+
         builder.setNegativeButton("Exit",dialogClickListener);
         builder.create().show();
     }
